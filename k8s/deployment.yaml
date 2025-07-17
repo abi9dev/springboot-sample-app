@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-catalog
+  labels:
+    app: product-catalog
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: product-catalog
+  template:
+    metadata:
+      labels:
+        app: product-catalog
+    spec:
+      containers:
+      - name: product-catalog
+        image: product-catalog:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DB_HOST
+          value: postgres-service
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: productdb
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+          requests:
+            cpu: "0.5"
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
