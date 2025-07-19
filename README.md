@@ -1,4 +1,4 @@
-# Product Catalog API
+# Product Catalog API -
 
 A Spring Boot application with PostgreSQL database designed for a Docker and Kubernetes Masterclass.
 
